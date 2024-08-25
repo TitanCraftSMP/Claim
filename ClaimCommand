@@ -1,0 +1,42 @@
+package de.ShadwGHG.claim;
+
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
+import java.util.UUID;
+
+public class ClaimCommand implements CommandExecutor {
+
+    private final claim plugin;
+
+    public ClaimCommand(claim plugin) {
+        this.plugin = plugin;
+    }
+
+    @Override
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (!(sender instanceof Player)) {
+            sender.sendMessage("Dieser Befehl kann nur von einem Spieler ausgeführt werden.");
+            return true;
+        }
+
+        Player player = (Player) sender;
+        UUID playerUUID = player.getUniqueId();
+
+        if (plugin.getClaimManager().getClaims(playerUUID).size() >= 2 && !player.isOp()) {
+            player.sendMessage("Du hast bereits die maximale Anzahl an Claims erreicht.");
+            return true;
+        }
+
+        claim claim = new claim(playerUUID);
+        if (plugin.getClaimManager().addClaim(playerUUID, claim)) {
+            player.sendMessage("Land erfolgreich geclaimed!");
+        } else {
+            player.sendMessage("Claimen des Landes fehlgeschlagen.");
+        }
+
+        return true;
+    }
+}
