@@ -1,0 +1,40 @@
+package de.ShadwGHG.claim;
+
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerInteractEvent;
+
+import java.util.UUID;
+
+public class ClaimListener implements Listener {
+
+    private final claim plugin;
+
+    public ClaimListener(claim plugin) {
+        this.plugin = plugin;
+    }
+
+    @EventHandler
+    public void onPlayerInteract(PlayerInteractEvent event) {
+        Player player = event.getPlayer();
+
+        if (player.getInventory().getItemInMainHand().getType() == Material.GOLDEN_SHOVEL) {
+            UUID playerUUID = player.getUniqueId();
+
+            if (plugin.getClaimManager().getClaims(playerUUID).size() < 2 || player.isOp()) {
+                claim claim = new claim(playerUUID);
+                if (plugin.getClaimManager().addClaim(playerUUID, claim)) {
+                    player.sendMessage("Land erfolgreich geclaimed!");
+                } else {
+                    player.sendMessage("Du hast bereits die maximale Anzahl an Claims erreicht.");
+                }
+            } else {
+                player.sendMessage("Du kannst kein weiteres Land claimen.");
+            }
+
+            event.setCancelled(true);
+        }
+    }
+}
